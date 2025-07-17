@@ -1,151 +1,150 @@
 import { Link } from "react-router-dom";
+import { Button, Form, Row, Col } from "react-bootstrap";
 
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue="A1 - ENV + HTML" />
-      <br />
-      <br />
+    <div id="wd-assignments-editor" className="p-4">
+      <h4 className="fw-bold mb-4">Edit Assignment</h4>
 
-      <textarea
-        id="wd-description"
-        defaultValue="The assignment is available online. Submit a link to the landing page of..."
-      />
+      <Form>
+        {/* Assignment Name */}
+        <Form.Group className="mb-3">
+          <Form.Label>Assignment Name</Form.Label>
+          <Form.Control
+            type="text"
+            defaultValue="A1 - ENV + HTML"
+            id="wd-name"
+          />
+        </Form.Group>
 
-      <table>
-        <tbody>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-points">Points</label>
-            </td>
-            <td>
-              <input id="wd-points" defaultValue={100} />
-            </td>
-          </tr>
+        {/* Description */}
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            defaultValue="The assignment is available online. Submit a link to the landing page of..."
+            id="wd-description"
+          />
+        </Form.Group>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-group">Assignment Group</label>
-            </td>
-            <td>
-              <select id="wd-group" defaultValue="ASSIGNMENTS">
+        <Row className="mb-3">
+          <Col md={6}>
+            {/* Points */}
+            <Form.Group className="mb-3">
+              <Form.Label>Points</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={100}
+                id="wd-points"
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            {/* Assignment Group */}
+            <Form.Group className="mb-3">
+              <Form.Label>Assignment Group</Form.Label>
+              <Form.Select defaultValue="ASSIGNMENTS" id="wd-group">
                 <option value="ASSIGNMENTS">Assignments</option>
                 <option value="QUIZZES">Quizzes</option>
-              </select>
-            </td>
-          </tr>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-display-grade-as">Display Grade as</label>
-            </td>
-            <td>
-              <select id="wd-display-grade-as" defaultValue="PERCENTAGE">
+        <Row className="mb-3">
+          <Col md={6}>
+            {/* Display Grade as */}
+            <Form.Group className="mb-3">
+              <Form.Label>Display Grade as</Form.Label>
+              <Form.Select defaultValue="PERCENTAGE" id="wd-display-grade-as">
                 <option value="PERCENTAGE">Percentage</option>
                 <option value="GRADE">Grade</option>
-              </select>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-submission-type">Submission Type</label>
-            </td>
-            <td>
-              <select id="wd-submission-type" defaultValue="ONLINE">
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            {/* Submission Type */}
+            <Form.Group className="mb-3">
+              <Form.Label>Submission Type</Form.Label>
+              <Form.Select defaultValue="ONLINE" id="wd-submission-type">
                 <option value="ONLINE">Online</option>
                 <option value="OFFLINE">Offline</option>
                 <option value="NONE">None</option>
-              </select>
-              <div style={{ marginTop: 16 }}>
-                <label><b>Online Entry Options</b></label>
-                <div>
-                  <input type="checkbox" id="wd-text-entry" defaultChecked />
-                  <label htmlFor="wd-text-entry" style={{ marginLeft: 8 }}>
-                    Text Entry
-                  </label>
-                </div>
-                <div>
-                  <input type="checkbox" id="wd-website-url" />
-                  <label htmlFor="wd-website-url" style={{ marginLeft: 8 }}>
-                    Website URL
-                  </label>
-                </div>
-                <div>
-                  <input type="checkbox" id="wd-media-recordings" />
-                  <label htmlFor="wd-media-recordings" style={{ marginLeft: 8 }}>
-                    Media Recordings
-                  </label>
-                </div>
-                <div>
-                  <input type="checkbox" id="wd-student-annotation" />
-                  <label htmlFor="wd-student-annotation" style={{ marginLeft: 8 }}>
-                    Student Annotation
-                  </label>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-assign-to">Assign To</label>
-            </td>
-            <td>
-              <input id="wd-assign-to" defaultValue="Everyone" />
-            </td>
-          </tr>
+        {/* Online Entry Options */}
+        <Form.Group className="mb-3">
+          <Form.Label><strong>Online Entry Options</strong></Form.Label>
+          <div className="mb-2">
+            <Form.Check
+              type="checkbox"
+              label="Text Entry"
+              id="wd-text-entry"
+              defaultChecked
+            />
+            <Form.Check
+              type="checkbox"
+              label="Website URL"
+              id="wd-website-url"
+            />
+            <Form.Check
+              type="checkbox"
+              label="Media Recordings"
+              id="wd-media-recordings"
+            />
+            <Form.Check
+              type="checkbox"
+              label="Student Annotation"
+              id="wd-student-annotation"
+            />
+          </div>
+        </Form.Group>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-due-date">Due Date</label>
-            </td>
-            <td>
-              <input id="wd-due-date" type="date" defaultValue="2021-01-01" />
-            </td>
-          </tr>
+        {/* Dates Section */}
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Assign To</Form.Label>
+              <Form.Control type="text" defaultValue="Everyone" id="wd-assign-to" />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Due Date</Form.Label>
+              <Form.Control type="date" defaultValue="2021-01-01" id="wd-due-date" />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Available From</Form.Label>
+              <Form.Control type="date" defaultValue="2021-01-01" id="wd-available-from" />
+            </Form.Group>
+          </Col>
+        </Row>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-available-from">Available From</label>
-            </td>
-            <td>
-              <input
-                id="wd-available-from"
-                type="date"
-                defaultValue="2021-01-01"
-              />
-            </td>
-          </tr>
+        <Row className="mb-4">
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Available Until</Form.Label>
+              <Form.Control type="date" defaultValue="2021-01-01" id="wd-available-until" />
+            </Form.Group>
+          </Col>
+        </Row>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-available-until">Available Until</label>
-            </td>
-            <td>
-              <input
-                id="wd-available-until"
-                type="date"
-                defaultValue="2021-01-01"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <br />
-
-      <div style={{ display: "flex", gap: 12 }}>
-        <Link to="../index.tsx">  <button type="button" className="wd-cancel-button">
-          Cancel
-        </button>
-        </Link>
-       <Link to="../index.tsx">  <button type="button" className="wd-save-button">
-          Save
-        </button>
-                </Link>
-      </div>
+        {/* Buttons */}
+        <div className="d-flex gap-2">
+          <Link to="../index.tsx">
+            <Button variant="secondary">Cancel</Button>
+          </Link>
+          <Link to="../index.tsx">
+            <Button variant="danger">Save</Button>
+          </Link>
+        </div>
+      </Form>
     </div>
   );
 }
