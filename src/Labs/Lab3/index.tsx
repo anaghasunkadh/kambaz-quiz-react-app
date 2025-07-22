@@ -31,7 +31,7 @@ import VariableTypes from "./VariableTypes";
 import Highlight from "./Highlight";
 import PathParameters from "./PathParameters";
 import AddPathParameters from "./AddPathParameters";
-import { Link } from "react-router-dom";
+import {  Route } from "react-router-dom";
 export default function Lab3() {
     console.log('Hello World!');
 
@@ -75,6 +75,7 @@ export default function Lab3() {
         vel nihil repellat nemo explicabo excepturi consectetur. Modi omnis minus sequi maiores, provident voluptates.
      </Highlight>
      <PathParameters />
+     <Route path="add/:a/:b" element={<AddPathParameters />} />
     </div>
   );
 }
