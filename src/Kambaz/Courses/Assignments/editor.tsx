@@ -1,47 +1,47 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button, Form, Row, Col } from "react-bootstrap";
+import * as db from "../../Database";
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams();
+  const assignment = db.assignments.find(a => a._id === aid);
+
   return (
     <div id="wd-assignments-editor" className="p-4">
       <h4 className="fw-bold mb-4">Edit Assignment</h4>
 
       <Form>
-        {/* Assignment Name */}
         <Form.Group className="mb-3">
           <Form.Label>Assignment Name</Form.Label>
           <Form.Control
             type="text"
-            defaultValue="A1 - ENV + HTML"
+            defaultValue={assignment?.title || ""}
             id="wd-name"
           />
         </Form.Group>
 
-        {/* Description */}
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control
             as="textarea"
             rows={4}
-            defaultValue="The assignment is available online. Submit a link to the landing page of..."
+            defaultValue={assignment?.description || ""}
             id="wd-description"
           />
         </Form.Group>
 
         <Row className="mb-3">
           <Col md={6}>
-            {/* Points */}
             <Form.Group className="mb-3">
               <Form.Label>Points</Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={100}
+                defaultValue={assignment?.points || 100}
                 id="wd-points"
               />
             </Form.Group>
           </Col>
           <Col md={6}>
-            {/* Assignment Group */}
             <Form.Group className="mb-3">
               <Form.Label>Assignment Group</Form.Label>
               <Form.Select defaultValue="ASSIGNMENTS" id="wd-group">
@@ -54,7 +54,6 @@ export default function AssignmentEditor() {
 
         <Row className="mb-3">
           <Col md={6}>
-            {/* Display Grade as */}
             <Form.Group className="mb-3">
               <Form.Label>Display Grade as</Form.Label>
               <Form.Select defaultValue="PERCENTAGE" id="wd-display-grade-as">
@@ -64,7 +63,6 @@ export default function AssignmentEditor() {
             </Form.Group>
           </Col>
           <Col md={6}>
-            {/* Submission Type */}
             <Form.Group className="mb-3">
               <Form.Label>Submission Type</Form.Label>
               <Form.Select defaultValue="ONLINE" id="wd-submission-type">
@@ -80,31 +78,14 @@ export default function AssignmentEditor() {
         <Form.Group className="mb-3">
           <Form.Label><strong>Online Entry Options</strong></Form.Label>
           <div className="mb-2">
-            <Form.Check
-              type="checkbox"
-              label="Text Entry"
-              id="wd-text-entry"
-              defaultChecked
-            />
-            <Form.Check
-              type="checkbox"
-              label="Website URL"
-              id="wd-website-url"
-            />
-            <Form.Check
-              type="checkbox"
-              label="Media Recordings"
-              id="wd-media-recordings"
-            />
-            <Form.Check
-              type="checkbox"
-              label="Student Annotation"
-              id="wd-student-annotation"
-            />
+            <Form.Check type="checkbox" label="Text Entry" id="wd-text-entry" defaultChecked />
+            <Form.Check type="checkbox" label="Website URL" id="wd-website-url" />
+            <Form.Check type="checkbox" label="Media Recordings" id="wd-media-recordings" />
+            <Form.Check type="checkbox" label="Student Annotation" id="wd-student-annotation" />
           </div>
         </Form.Group>
 
-        {/* Dates Section */}
+        {/* Dates */}
         <Row className="mb-3">
           <Col md={4}>
             <Form.Group>
@@ -135,12 +116,12 @@ export default function AssignmentEditor() {
           </Col>
         </Row>
 
-        {/* Buttons */}
+        {/* Cancel and Save Buttons */}
         <div className="d-flex gap-2">
-          <Link to="../index.tsx">
+          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
             <Button variant="secondary">Cancel</Button>
           </Link>
-          <Link to="../index.tsx">
+          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
             <Button variant="danger">Save</Button>
           </Link>
         </div>

@@ -4,9 +4,18 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
 import ListGroup from "react-bootstrap/esm/ListGroup";
+import React from "react";
 
 export default function KambazNavigation() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+
+  const links = [
+    { label: "Dashboard", path: "/Kambaz/Dashboard", icon: AiOutlineDashboard },
+    { label: "Courses",   path: "/Kambaz/Courses",   icon: LiaBookSolid },
+    { label: "Calendar",  path: "/Kambaz/Calendar",  icon: IoCalendarOutline },
+    { label: "Inbox",     path: "/Kambaz/Inbox",     icon: FaInbox },
+    { label: "Labs",      path: "/Labs",             icon: LiaCogSolid },
+  ];
 
   return (
     <ListGroup id="wd-kambaz-navigation" style={{ width: 110 }}
@@ -18,49 +27,22 @@ export default function KambazNavigation() {
         <img src="/images/Northeastern.jpg" width="65px" />
       </ListGroup.Item>
 
-<ListGroup.Item to="/Kambaz/Account" as={Link}
-  className={`text-center border-0 fw-bold
-    ${location.pathname.startsWith("/Kambaz/Account") ? "bg-white text-danger" : "bg-black text-white"}`}>
-  <FaRegCircleUser 
-    className={`fs-1 ${location.pathname.startsWith("/Kambaz/Account") ? "text-danger" : "text-white"}`} 
-  />
-  Account
-</ListGroup.Item>
-
-      <ListGroup.Item to="/Kambaz/Dashboard" as={Link}
-        className={`text-center border-0 fw-bold
-          ${location.pathname.startsWith("/Kambaz/Dashboard") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <AiOutlineDashboard className="fs-1 text-danger" />
-        Dashboard
+      <ListGroup.Item as={Link} to="/Kambaz/Account" className={`text-center border-0 bg-black
+        ${pathname.includes("Account") ? "bg-white text-danger" : "bg-black text-white"}`}>
+        <FaRegCircleUser className={`fs-1 ${pathname.includes("Account") ? "text-danger" : "text-white"}`} />
+        <br />
+        Account
       </ListGroup.Item>
 
-      <ListGroup.Item to="/Kambaz/Courses" as={Link}
-        className={`text-center border-0 fw-bold
-          ${location.pathname.startsWith("/Kambaz/Courses") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <LiaBookSolid className="fs-1 text-danger" />
-        Courses
-      </ListGroup.Item>
-
-      <ListGroup.Item to="/Kambaz/Calendar" as={Link}
-        className={`text-center border-0 fw-bold
-          ${location.pathname.startsWith("/Kambaz/Calendar") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <IoCalendarOutline className="fs-1 text-danger" />
-        Calendar
-      </ListGroup.Item>
-
-      <ListGroup.Item to="/Kambaz/Inbox" as={Link}
-        className={`text-center border-0 fw-bold
-          ${location.pathname.startsWith("/Kambaz/Inbox") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <FaInbox className="fs-1 text-danger" />
-        Inbox
-      </ListGroup.Item>
-
-      <ListGroup.Item to="/Labs" as={Link}
-        className={`text-center border-0 fw-bold
-          ${location.pathname.startsWith("/Labs") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <LiaCogSolid className="fs-1 text-danger" />
-        <br /> Labs
-      </ListGroup.Item>
+      {links.map((link) => (
+        <ListGroup.Item key={link.path} as={Link} to={link.path}
+          className={`text-center border-0 fw-bold
+            ${pathname.startsWith(link.path) ? "bg-white text-danger" : "bg-black text-white"}`}>
+          {React.createElement(link.icon, { className: "fs-1 text-danger" })}
+          <br />
+          {link.label}
+        </ListGroup.Item>
+      ))}
 
     </ListGroup>
   );

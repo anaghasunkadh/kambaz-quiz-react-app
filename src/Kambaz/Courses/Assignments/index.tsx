@@ -1,8 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
+import * as db from "../../Database";
 
 export default function Assignments() {
+  const { cid } = useParams();  // Get the current course ID from URL
+  const assignments = db.assignments.filter(a => a.course === cid);
+
   return (
     <div id="wd-assignments" className="p-4">
       {/* Search bar and buttons */}
@@ -11,10 +15,7 @@ export default function Assignments() {
           <InputGroup.Text>
             <FaSearch />
           </InputGroup.Text>
-          <Form.Control
-            placeholder="Search for Assignments"
-            id="wd-search-assignment"
-          />
+          <Form.Control placeholder="Search for Assignments" id="wd-search-assignment" />
         </InputGroup>
 
         <div className="ms-auto">
@@ -32,7 +33,7 @@ export default function Assignments() {
       {/* Section header */}
       <div className="mb-3 d-flex justify-content-between align-items-center">
         <h5 className="fw-bold mb-0">
-          ASSIGNMENTS 40% of Total
+          ASSIGNMENTS ({assignments.length}) for Course {cid}
         </h5>
         <Button size="sm" variant="secondary">
           <FaPlus />
@@ -41,39 +42,20 @@ export default function Assignments() {
 
       {/* Assignment list */}
       <ListGroup id="wd-assignment-list">
-        {[
-          {
-            title: "A1 - ENV + HTML",
-            info:
-              "MULTIPLE MODULES | Not available until May 6 at 12:00am | Due May 13 at 11:59 PM | 100 Pts",
-            link: "123",
-          },
-          {
-            title: "A2 - JavaScript Basics",
-            info:
-              "MULTIPLE MODULES | Not available until May 13 at 12:00am | Due May 20 at 11:59 PM | 100 Pts",
-            link: "124",
-          },
-          {
-            title: "A3 - CSS Fundamentals",
-            info:
-              "MULTIPLE MODULES | Not available until May 20 at 12:00am | Due May 27 at 11:59 PM | 100 Pts",
-            link: "125",
-          },
-        ].map((assignment) => (
+        {assignments.map((assignment) => (
           <ListGroup.Item
-            key={assignment.link}
+            key={assignment._id}
             className="d-flex border-start border-5 border-success mb-2 p-3"
           >
             <div className="flex-grow-1">
               <Link
-                to={assignment.link}
+                to={`/Kambaz/Courses/${cid}/Assignments/${assignment._id}`}
                 className="fw-bold text-decoration-none d-block mb-1 text-dark"
               >
                 {assignment.title}
               </Link>
               <div className="text-muted small">
-                {assignment.info}
+                MULTIPLE MODULES | Not available until TBD | Due TBD | 100 Pts
               </div>
             </div>
           </ListGroup.Item>
