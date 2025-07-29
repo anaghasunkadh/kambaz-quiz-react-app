@@ -1,131 +1,143 @@
-import { Link, useParams } from "react-router-dom";
-import { Button, Form, Row, Col } from "react-bootstrap";
-import * as db from "../../Database";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { updateAssignment, addAssignment } from "./reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
-  const assignment = db.assignments.find(a => a._id === aid);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
+  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+
+  // Find existing assignment if editing, or empty if new
+  const existingAssignment = aid && aid !== "new" ? assignments.find((a: any) => a._id === aid) : null;
+
+  const [assignment, setAssignment] = useState<any>({
+    title: "",
+    description: "",
+    points: 0,
+    dueDate: "",
+    availableFrom: "",
+    availableUntil: "",
+    course: cid,
+  });
+
+  useEffect(() => {
+    if (existingAssignment) setAssignment(existingAssignment);
+  }, [existingAssignment]);
+
+  // Redirect if no faculty role (optional)
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "FACULTY") {
+      alert("You do not have permission to edit assignments.");
+      navigate(`/Kambaz/Courses/${cid}/Assignments`);
+    }
+  }, [currentUser, cid, navigate]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setAssignment((prev: any) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSave = () => {
+    if (aid === "new") {
+      dispatch(addAssignment(assignment));
+    } else {
+      dispatch(updateAssignment(assignment));
+    }
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  };
+
+  const isFaculty = currentUser?.role === "FACULTY";
 
   return (
-    <div id="wd-assignments-editor" className="p-4">
-      <h4 className="fw-bold mb-4">Edit Assignment</h4>
+    <div className="p-4">
+      <h3>{aid === "new" ? "Create Assignment" : "Edit Assignment"}</h3>
 
-      <Form>
-        <Form.Group className="mb-3">
-          <Form.Label>Assignment Name</Form.Label>
-          <Form.Control
-            type="text"
-            defaultValue={assignment?.title || ""}
-            id="wd-name"
-          />
-        </Form.Group>
+      <div className="mb-3">
+        <label htmlFor="title" className="form-label">Title</label>
+        <input
+          id="title"
+          className="form-control"
+          value={assignment.title}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            defaultValue={assignment?.description || ""}
-            id="wd-description"
-          />
-        </Form.Group>
+      <div className="mb-3">
+        <label htmlFor="description" className="form-label">Description</label>
+        <textarea
+          id="description"
+          className="form-control"
+          value={assignment.description}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Points</Form.Label>
-              <Form.Control
-                type="number"
-                defaultValue={assignment?.points || 100}
-                id="wd-points"
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Assignment Group</Form.Label>
-              <Form.Select defaultValue="ASSIGNMENTS" id="wd-group">
-                <option value="ASSIGNMENTS">Assignments</option>
-                <option value="QUIZZES">Quizzes</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
+      <div className="mb-3">
+        <label htmlFor="points" className="form-label">Points</label>
+        <input
+          id="points"
+          type="number"
+          className="form-control"
+          value={assignment.points}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Display Grade as</Form.Label>
-              <Form.Select defaultValue="PERCENTAGE" id="wd-display-grade-as">
-                <option value="PERCENTAGE">Percentage</option>
-                <option value="GRADE">Grade</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Submission Type</Form.Label>
-              <Form.Select defaultValue="ONLINE" id="wd-submission-type">
-                <option value="ONLINE">Online</option>
-                <option value="OFFLINE">Offline</option>
-                <option value="NONE">None</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
+      <div className="mb-3">
+        <label htmlFor="dueDate" className="form-label">Due Date</label>
+        <input
+          id="dueDate"
+          type="date"
+          className="form-control"
+          value={assignment.dueDate}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        {/* Online Entry Options */}
-        <Form.Group className="mb-3">
-          <Form.Label><strong>Online Entry Options</strong></Form.Label>
-          <div className="mb-2">
-            <Form.Check type="checkbox" label="Text Entry" id="wd-text-entry" defaultChecked />
-            <Form.Check type="checkbox" label="Website URL" id="wd-website-url" />
-            <Form.Check type="checkbox" label="Media Recordings" id="wd-media-recordings" />
-            <Form.Check type="checkbox" label="Student Annotation" id="wd-student-annotation" />
-          </div>
-        </Form.Group>
+      <div className="mb-3">
+        <label htmlFor="availableFrom" className="form-label">Available From</label>
+        <input
+          id="availableFrom"
+          type="date"
+          className="form-control"
+          value={assignment.availableFrom}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        {/* Dates */}
-        <Row className="mb-3">
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Assign To</Form.Label>
-              <Form.Control type="text" defaultValue="Everyone" id="wd-assign-to" />
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Due Date</Form.Label>
-              <Form.Control type="date" defaultValue="2021-01-01" id="wd-due-date" />
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Available From</Form.Label>
-              <Form.Control type="date" defaultValue="2021-01-01" id="wd-available-from" />
-            </Form.Group>
-          </Col>
-        </Row>
+      <div className="mb-3">
+        <label htmlFor="availableUntil" className="form-label">Available Until</label>
+        <input
+          id="availableUntil"
+          type="date"
+          className="form-control"
+          value={assignment.availableUntil}
+          onChange={handleChange}
+          disabled={!isFaculty}
+        />
+      </div>
 
-        <Row className="mb-4">
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Available Until</Form.Label>
-              <Form.Control type="date" defaultValue="2021-01-01" id="wd-available-until" />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Cancel and Save Buttons */}
-        <div className="d-flex gap-2">
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
-            <Button variant="secondary">Cancel</Button>
-          </Link>
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`}>
-            <Button variant="danger">Save</Button>
-          </Link>
-        </div>
-      </Form>
+      <div className="d-flex gap-2">
+        <button className="btn btn-primary" onClick={handleSave} disabled={!isFaculty}>
+          Save
+        </button>
+        <button className="btn btn-secondary" onClick={handleCancel}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }
