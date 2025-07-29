@@ -2,7 +2,7 @@ import { FaPlus } from "react-icons/fa6";
 import GreenCheckmark from "./GreenCheckmark";
 import { Button, Dropdown } from "react-bootstrap";
 import ModuleEditor from "./ModuleEditor";
-import React, { useState } from "react";
+import  { useState } from "react";
 
 export default function ModulesControls({ moduleName, setModuleName, addModule }:
 { moduleName: string; setModuleName: (title: string) => void; addModule: () => void; }) {

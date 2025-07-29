@@ -1,5 +1,4 @@
 // src/Labs/Lab4/ReduxExamples/todos/TodoItem.tsx
-import React from "react";
 import { useDispatch } from "react-redux";
 import { ListGroup, Button } from "react-bootstrap";
 import { deleteTodo, setTodo } from "./todosReducer";

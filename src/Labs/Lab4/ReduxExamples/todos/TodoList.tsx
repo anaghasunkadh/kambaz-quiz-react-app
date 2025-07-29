@@ -1,5 +1,4 @@
 // src/Labs/Lab4/ReduxExamples/todos/TodoList.tsx
-import React from "react";
 import { useSelector } from "react-redux";
 import { ListGroup } from "react-bootstrap";
 import TodoForm from "./TodoForm";

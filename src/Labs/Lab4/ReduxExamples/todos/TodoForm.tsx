@@ -1,5 +1,4 @@
 // src/Labs/Lab4/ReduxExamples/todos/TodoForm.tsx
-import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ListGroup, Button, FormControl } from "react-bootstrap";
 import { addTodo, updateTodo, setTodo } from "./todosReducer";
