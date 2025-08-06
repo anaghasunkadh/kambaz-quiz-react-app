@@ -39,15 +39,7 @@ export default function Modules() {
 
   const isFaculty = currentUser?.role === "FACULTY";
 
-  const addModuleHandler = () => {
-    if (!moduleName.trim()) return;
-    dispatch(addModule({ name: moduleName, course: cid }));
-    setModuleName("");
-  };
 
-  const deleteModuleHandler = (moduleId: string) => {
-    dispatch(deleteModule(moduleId));
-  };
 
   const editModuleHandler = (moduleId: string) => {
     dispatch(editModule(moduleId));

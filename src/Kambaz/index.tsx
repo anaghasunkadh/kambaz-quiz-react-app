@@ -6,9 +6,7 @@ import Courses from "./Courses";
 import ProtectedRoute from "./Account/ProtectedRoute";            // existing protected route
 import ProtectedCourseRoute from "./Account/ProtectedCourseRoute"; // new protected course route
 import "./styles.css";
-import * as db from "./Database";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import * as courseClient from "./Courses/client";
 
 import Session from "./Account/Session";
@@ -46,7 +44,7 @@ export default function Kambaz() {
   };
 
   const deleteCourse = async (courseId: any) => {
-    const status = await courseClient.deleteCourse(courseId);
+    //const status = await courseClient.deleteCourse(courseId);
 
     setCourses(courses.filter((course) => course._id !== courseId));
   };
