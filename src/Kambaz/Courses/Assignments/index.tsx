@@ -2,16 +2,30 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteAssignment } from "./reducer";
+import { useEffect } from "react";
+
+import {
+  fetchAssignmentsForCourse,
+  deleteAssignmentAPI,
+} from "./reducer";
+
+import type { AppDispatch } from "../../store";  // <-- import your store's dispatch type
 
 export default function Assignments() {
   const { cid } = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();  // <-- typed dispatch
   const navigate = useNavigate();
+
   const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
   const assignments = useSelector((state: any) =>
     state.assignmentsReducer.assignments.filter((a: any) => a.course === cid)
   );
+
+  const status = useSelector((state: any) => state.assignmentsReducer.status);
+
+  useEffect(() => {
+    if (cid) dispatch(fetchAssignmentsForCourse(cid));
+  }, [cid, dispatch]);
 
   const handleDelete = (assignmentId: string) => {
     if (currentUser?.role !== "FACULTY") {
@@ -22,7 +36,7 @@ export default function Assignments() {
       "Are you sure you want to delete this assignment?"
     );
     if (confirmed) {
-      dispatch(deleteAssignment(assignmentId));
+      dispatch(deleteAssignmentAPI(assignmentId));
     }
   };
 
@@ -56,6 +70,8 @@ export default function Assignments() {
           <FaPlus />
         </Button>
       </div>
+
+      {status === "loading" && <p>Loading assignments...</p>}
 
       <ListGroup id="wd-assignment-list">
         {assignments.map((assignment: any) => (

@@ -1,26 +1,21 @@
-import  { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FormControl, Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
-import * as db from "../Database";
+import * as client from "./client";
 
 export default function Signin() {
   const [credentials, setCredentials] = useState({ loginId: "", password: "" });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const signin = () => {
-    // Find user by loginId and password (password field missing in your JSON, so assuming password == loginId for demo)
-    // You might want to adjust based on your real password field!
-    const user = db.users.find(
-      (u: any) =>
-        u.loginId === credentials.loginId && 
-        (credentials.password === u.loginId) // placeholder check; replace with real password check if you add password
-    );
-
-    if (!user) return; // ignore if no user matches
-
+  const signin = async () => {
+    const user = await client.signin(credentials);
+    if (!user) {
+      alert("Invalid loginId or password");
+      return;
+    }
     dispatch(setCurrentUser(user));
     navigate("/Kambaz/Dashboard");
   };

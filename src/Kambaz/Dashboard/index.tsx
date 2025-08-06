@@ -40,11 +40,7 @@ export default function Dashboard({
       (e: any) => e.course === courseId && e.user === currentUser._id
     );
 
-  const displayedCourses = isFaculty
-    ? courses
-    : showAllCourses
-    ? courses
-    : courses.filter((course) => isEnrolled(course._id));
+  const displayedCourses = courses;
 
   const toggleShowAllCourses = () => setShowAllCourses(!showAllCourses);
 
@@ -164,56 +160,65 @@ export default function Dashboard({
                       >
                         {course.description}
                       </Card.Text>
-
-                      <Button variant="primary">Go</Button>
-
-                      {isFaculty ? (
-                        <>
-                          <button
-                            onClick={(event) => {
-                              event.preventDefault();
-                              handleDelete(course._id);
-                            }}
-                            className="btn btn-danger float-end"
-                            id="wd-delete-course-click"
-                          >
-                            Delete
-                          </button>
-
-                          <button
-                            id="wd-edit-course-click"
-                            onClick={(event) => {
-                              event.preventDefault();
-                              handleEdit(course);
-                            }}
-                            className="btn btn-warning me-2 float-end"
-                          >
-                            Edit
-                          </button>
-                        </>
-                      ) : enrolled ? (
-                        <button
-                          className="btn btn-danger float-end"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleUnenroll(course._id);
-                          }}
-                        >
-                          Unenroll
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-success float-end"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleEnroll(course._id);
-                          }}
-                        >
-                          Enroll
-                        </button>
-                      )}
                     </Card.Body>
                   </Link>
+
+                  {/* Buttons outside the Link to avoid click interference */}
+                  <Card.Footer>
+                    <Button variant="primary" className="me-2">
+                      Go
+                    </Button>
+
+                    {isFaculty ? (
+                      <>
+                        <Button
+                          variant="danger"
+                          className="float-end ms-2"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            handleDelete(course._id);
+                          }}
+                          id="wd-delete-course-click"
+                        >
+                          Delete
+                        </Button>
+
+                        <Button
+                          variant="warning"
+                          className="float-end ms-2"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            handleEdit(course);
+                          }}
+                          id="wd-edit-course-click"
+                        >
+                          Edit
+                        </Button>
+                      </>
+                    ) : enrolled ? (
+                      <Button
+                        variant="danger"
+                        className="float-end"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleUnenroll(course._id);
+                        }}
+                      >
+                        Unenroll
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="success"
+                        className="float-end"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleEnroll(course._id);
+                        }}
+                      >
+                        Enroll
+                      </Button>
+                    )}
+                  </Card.Footer>
                 </Card>
               </Col>
             );

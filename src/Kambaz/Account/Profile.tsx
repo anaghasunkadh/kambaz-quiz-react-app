@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCurrentUser } from "./reducer";
 import { FormControl, Button } from "react-bootstrap";
+import * as client from "./client";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>({});
@@ -15,7 +16,9 @@ export default function Profile() {
     setProfile(currentUser);
   };
 
-  const signout = () => {
+  const signout = async() => {
+        await client.signout();
+
     dispatch(setCurrentUser(null));
     navigate("/Kambaz/Account/Signin");
   };
@@ -23,6 +26,10 @@ export default function Profile() {
   useEffect(() => {
     fetchProfile();
   }, []);
+  const updateProfile = async () => {
+    const updatedProfile = await client.updateUser(profile);
+    dispatch(setCurrentUser(updatedProfile));
+  };
 
   return (
     <div className="wd-profile-screen p-4">
@@ -77,6 +84,7 @@ export default function Profile() {
             <option value="FACULTY">Faculty</option>
             <option value="STUDENT">Student</option>
           </select>
+          <button onClick={updateProfile} className="btn btn-primary w-100 mb-2"> Update </button>
 
           <Button
             onClick={signout}

@@ -1,17 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import { updateAssignment, addAssignment } from "./reducer";
+
+import {
+  createAssignmentForCourse,
+  updateAssignmentAPI,
+} from "./reducer";
+
+import type { AppDispatch } from "../../store"; // update the path accordingly
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>(); // typed dispatch
   const navigate = useNavigate();
 
   const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
   const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
 
-  // Find existing assignment if editing, or empty if new
   const existingAssignment = aid && aid !== "new" ? assignments.find((a: any) => a._id === aid) : null;
 
   const [assignment, setAssignment] = useState<any>({
@@ -41,11 +46,13 @@ export default function AssignmentEditor() {
     setAssignment((prev: any) => ({ ...prev, [id]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!cid) return; // safeguard
+
     if (aid === "new") {
-      dispatch(addAssignment(assignment));
+      await dispatch(createAssignmentForCourse({ courseId: cid, assignment }));
     } else {
-      dispatch(updateAssignment(assignment));
+      await dispatch(updateAssignmentAPI(assignment));
     }
     navigate(`/Kambaz/Courses/${cid}/Assignments`);
   };
