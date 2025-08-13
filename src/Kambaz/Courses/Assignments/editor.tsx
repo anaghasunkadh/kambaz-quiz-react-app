@@ -2,22 +2,20 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 
-import {
-  createAssignmentForCourse,
-  updateAssignmentAPI,
-} from "./reducer";
-
-import type { AppDispatch } from "../../store"; // update the path accordingly
+import { createAssignmentForCourse, updateAssignmentAPI } from "./reducer";
+import type { AppDispatch } from "../../store";
 
 export default function AssignmentEditor() {
-  const { cid, aid } = useParams();
-  const dispatch = useDispatch<AppDispatch>(); // typed dispatch
+  const { cid, aid } = useParams(); // aid is title
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
   const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
 
-  const existingAssignment = aid && aid !== "new" ? assignments.find((a: any) => a._id === aid) : null;
+  const existingAssignment = aid && aid !== "new"
+    ? assignments.find((a: any) => a.title === aid)
+    : null;
 
   const [assignment, setAssignment] = useState<any>({
     title: "",
@@ -33,7 +31,6 @@ export default function AssignmentEditor() {
     if (existingAssignment) setAssignment(existingAssignment);
   }, [existingAssignment]);
 
-  // Redirect if no faculty role (optional)
   useEffect(() => {
     if (!currentUser || currentUser.role !== "FACULTY") {
       alert("You do not have permission to edit assignments.");
@@ -47,7 +44,7 @@ export default function AssignmentEditor() {
   };
 
   const handleSave = async () => {
-    if (!cid) return; // safeguard
+    if (!cid) return;
 
     if (aid === "new") {
       await dispatch(createAssignmentForCourse({ courseId: cid, assignment }));
@@ -74,7 +71,7 @@ export default function AssignmentEditor() {
           className="form-control"
           value={assignment.title}
           onChange={handleChange}
-          disabled={!isFaculty}
+          disabled={!isFaculty || aid !== "new"} // Prevent title editing in edit mode
         />
       </div>
 
@@ -107,7 +104,7 @@ export default function AssignmentEditor() {
           id="dueDate"
           type="date"
           className="form-control"
-          value={assignment.dueDate}
+          value={assignment.dueDate?.slice(0, 10) ?? ""}
           onChange={handleChange}
           disabled={!isFaculty}
         />
@@ -119,7 +116,7 @@ export default function AssignmentEditor() {
           id="availableFrom"
           type="date"
           className="form-control"
-          value={assignment.availableFrom}
+          value={assignment.availableFrom?.slice(0, 10) ?? ""}
           onChange={handleChange}
           disabled={!isFaculty}
         />
@@ -131,7 +128,7 @@ export default function AssignmentEditor() {
           id="availableUntil"
           type="date"
           className="form-control"
-          value={assignment.availableUntil}
+          value={assignment.availableUntil?.slice(0, 10) ?? ""}
           onChange={handleChange}
           disabled={!isFaculty}
         />

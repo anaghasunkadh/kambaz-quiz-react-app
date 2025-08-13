@@ -1,11 +1,9 @@
-// src/Kambaz/Courses/Assignments/reducer.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as assignmentsClient from "./client";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface Assignment {
-  _id: string;
-  title: string;
+  title: string; // Now acting as unique ID
   description: string;
   points: number;
   dueDate: string;
@@ -36,7 +34,7 @@ export const fetchAssignmentsForCourse = createAsyncThunk(
 
 export const createAssignmentForCourse = createAsyncThunk(
   "assignments/createForCourse",
-  async ({ courseId, assignment }: { courseId: string; assignment: Omit<Assignment, "_id"> }) => {
+  async ({ courseId, assignment }: { courseId: string; assignment: Assignment }) => {
     const data = await assignmentsClient.createAssignmentForCourse(courseId, assignment);
     return data as Assignment;
   }
@@ -52,9 +50,9 @@ export const updateAssignmentAPI = createAsyncThunk(
 
 export const deleteAssignmentAPI = createAsyncThunk(
   "assignments/delete",
-  async (assignmentId: string) => {
-    await assignmentsClient.deleteAssignment(assignmentId);
-    return assignmentId;
+  async (title: string) => {
+    await assignmentsClient.deleteAssignment(title);
+    return title;
   }
 );
 
@@ -80,13 +78,13 @@ const assignmentsSlice = createSlice({
         state.assignments.push(action.payload);
       })
       .addCase(updateAssignmentAPI.fulfilled, (state, action: PayloadAction<Assignment>) => {
-        const idx = state.assignments.findIndex(a => a._id === action.payload._id);
+        const idx = state.assignments.findIndex((a) => a.title === action.payload.title);
         if (idx !== -1) {
           state.assignments[idx] = action.payload;
         }
       })
       .addCase(deleteAssignmentAPI.fulfilled, (state, action: PayloadAction<string>) => {
-        state.assignments = state.assignments.filter(a => a._id !== action.payload);
+        state.assignments = state.assignments.filter((a) => a.title !== action.payload);
       });
   },
 });

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Row, Col, Card, Button, FormControl } from "react-bootstrap";
-import { enroll, unenroll } from "../Enrollments/reducer"; // Adjust path if needed
 
 interface DashboardProps {
   courses: any[];
@@ -11,6 +10,9 @@ interface DashboardProps {
   addNewCourse: () => void;
   deleteCourse: (courseId: any) => void;
   updateCourse: () => void;
+  enrolling: boolean;
+  setEnrolling: (enrolling: boolean) => void;
+  updateEnrollment: (courseId: string, enrolled: boolean) => void;
 }
 
 export default function Dashboard({
@@ -20,44 +22,17 @@ export default function Dashboard({
   addNewCourse,
   deleteCourse,
   updateCourse,
+  enrolling,
+  setEnrolling,
+  updateEnrollment,
 }: DashboardProps) {
-  const dispatch = useDispatch();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const enrollments = useSelector(
-    (state: any) => state.enrollmentsReducer.enrollments
-  );
-
-  const [showAllCourses, setShowAllCourses] = useState(false);
 
   if (!currentUser) {
     return <h3>Please sign in to view your dashboard.</h3>;
   }
 
   const isFaculty = currentUser.role === "FACULTY";
-
-  const isEnrolled = (courseId: string) =>
-    enrollments.some(
-      (e: any) => e.course === courseId && e.user === currentUser._id
-    );
-
-  const displayedCourses = courses;
-
-  const toggleShowAllCourses = () => setShowAllCourses(!showAllCourses);
-
-  const handleEnroll = (courseId: string) => {
-    if (!isEnrolled(courseId)) {
-      dispatch(enroll({ user: currentUser._id, course: courseId }));
-    }
-  };
-
-  const handleUnenroll = (courseId: string) => {
-    dispatch(unenroll({ user: currentUser._id, course: courseId }));
-  };
-
-  const handleAdd = () => addNewCourse();
-  const handleUpdate = () => updateCourse();
-  const handleDelete = (id: string) => deleteCourse(id);
-  const handleEdit = (selectedCourse: any) => setCourse(selectedCourse);
 
   return (
     <div id="wd-dashboard">
@@ -66,16 +41,14 @@ export default function Dashboard({
         className="d-flex justify-content-between align-items-center"
       >
         Dashboard
-        {!isFaculty && (
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={toggleShowAllCourses}
-            style={{ minWidth: "100px" }}
-          >
-            {showAllCourses ? "Show Enrollments" : "Show All Courses"}
-          </Button>
-        )}
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => setEnrolling(!enrolling)}
+          style={{ minWidth: "100px" }}
+        >
+          {enrolling ? "My Courses" : "All Courses"}
+        </Button>
       </h1>
       <hr />
 
@@ -86,13 +59,13 @@ export default function Dashboard({
             <button
               className="btn btn-primary float-end"
               id="wd-add-new-course-click"
-              onClick={handleAdd}
+              onClick={addNewCourse}
             >
               Add
             </button>
             <button
               className="btn btn-warning float-end me-2"
-              onClick={handleUpdate}
+              onClick={updateCourse}
               id="wd-update-course-click"
             >
               Update
@@ -114,14 +87,13 @@ export default function Dashboard({
         </>
       )}
 
-      <h2 id="wd-dashboard-published">
-        Published Courses ({displayedCourses.length})
-      </h2>
+      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2>
       <hr />
       <div id="wd-dashboard-courses">
         <Row xs={1} md={3} lg={5} className="g-4">
-          {displayedCourses.map((course: any) => {
-            const enrolled = isEnrolled(course._id);
+          {courses.map((course: any) => {
+            // Use enrolled flag on course directly (from props)
+            const enrolled = course.enrolled ?? false;
 
             return (
               <Col key={course._id} className="wd-dashboard-course">
@@ -163,59 +135,36 @@ export default function Dashboard({
                     </Card.Body>
                   </Link>
 
-                  {/* Buttons outside the Link to avoid click interference */}
                   <Card.Footer>
-                    <Button variant="primary" className="me-2">
-                      Go
-                    </Button>
-
-                    {isFaculty ? (
-                      <>
+                    {!isFaculty && enrolling ? (
+                      enrolled ? (
                         <Button
                           variant="danger"
-                          className="float-end ms-2"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            handleDelete(course._id);
+                          className="float-end"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log("Unenroll clicked for course", course._id);
+                            updateEnrollment(course._id, false);
                           }}
-                          id="wd-delete-course-click"
                         >
-                          Delete
+                          Unenroll
                         </Button>
-
+                      ) : (
                         <Button
-                          variant="warning"
-                          className="float-end ms-2"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            handleEdit(course);
+                          variant="success"
+                          className="float-end"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log("Enroll clicked for course", course._id);
+                            updateEnrollment(course._id, true);
                           }}
-                          id="wd-edit-course-click"
                         >
-                          Edit
+                          Enroll
                         </Button>
-                      </>
-                    ) : enrolled ? (
-                      <Button
-                        variant="danger"
-                        className="float-end"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleUnenroll(course._id);
-                        }}
-                      >
-                        Unenroll
-                      </Button>
+                      )
                     ) : (
-                      <Button
-                        variant="success"
-                        className="float-end"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleEnroll(course._id);
-                        }}
-                      >
-                        Enroll
+                      <Button variant="primary" className="me-2">
+                        Go
                       </Button>
                     )}
                   </Card.Footer>
