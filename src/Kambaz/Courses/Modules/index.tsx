@@ -8,7 +8,6 @@ import * as modulesClient from "./client";
 import * as courseClient from "../client";
 
 import  { useState , useEffect} from "react";
-import * as coursesClient from "../client";
 
 import { useSelector, useDispatch } from "react-redux";
 import { addModule, editModule, updateModule, deleteModule, setModules } from "./reducer";
