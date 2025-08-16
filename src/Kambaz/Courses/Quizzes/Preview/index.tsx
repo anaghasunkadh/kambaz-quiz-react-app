@@ -11,7 +11,13 @@ export default function Preview() {
   useEffect(() => {
     if (!quizId) return;
     getQuiz(quizId).then(setQuiz);
-    getQuestions(quizId).then(setQuestions);
+    getQuestions(quizId).then((allQuestions) => {
+      // Filter out metadata questions from quiz preview
+      const quizQuestions = allQuestions.filter((q: any) => 
+        q.title !== "__METADATA__" && q.type !== "metadata"
+      );
+      setQuestions(quizQuestions);
+    });
   }, [quizId]);
 
   const q = questions[i];

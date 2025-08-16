@@ -14,16 +14,40 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
   const load = async () => {
     try {
       const questionsData = await getQuestions(quizId);
-      setQuestions(questionsData);
       
-      // Try to load groups from metadata question first
+      const processedQuestions = questionsData.map((q: any) => {
+        if (q.title === "__METADATA__" || q.type === "metadata") {
+          return q; 
+        }
+        
+        let extractedGroup = 'Ungrouped';
+        
+        if (q.group && q.group !== 'Ungrouped') {
+          extractedGroup = q.group;
+        } else if (q.title && q.title.match(/^\[(.*?)\]/)) {
+          const match = q.title.match(/^\[(.*?)\]/);
+          if (match && match[1]) {
+            extractedGroup = match[1];
+          }
+        } else if (q.description && q.description.includes('Group:')) {
+          const groupMatch = q.description.match(/Group:\s*(.+?)(?:\n|$)/);
+          if (groupMatch && groupMatch[1]) {
+            extractedGroup = groupMatch[1].trim();
+          }
+        }
+        
+        return { ...q, group: extractedGroup };
+      });
+      
+      console.log('Processed questions with extracted groups:', processedQuestions);
+      setQuestions(processedQuestions);
+      
       const metadataQuestion = questionsData.find((q: any) => q.title === "__METADATA__");
       let loadedGroups = ['Ungrouped'];
       
       if (metadataQuestion && metadataQuestion.groups) {
         loadedGroups = ['Ungrouped', ...metadataQuestion.groups.filter((g: string) => g !== 'Ungrouped')];
       } else {
-        // Fallback to localStorage
         const storedGroups = localStorage.getItem(`quiz_${quizId}_groups`);
         if (storedGroups) {
           try {
@@ -34,16 +58,13 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           }
         }
         
-        // Also extract groups from existing questions
         const questionGroups = [...new Set(questionsData.map((q: any) => q.group || 'Ungrouped'))];
         loadedGroups = [...new Set([...loadedGroups, ...questionGroups])] as string[];
       }
       
       setGroups(loadedGroups);
       
-      // Initialize groups if none exist
       if (loadedGroups.length === 1 && loadedGroups[0] === 'Ungrouped') {
-        // Create default groups if none exist
         const defaultGroups = ['Basic Concepts', 'Advanced Topics', 'Problem Solving'];
         for (const group of defaultGroups) {
           await createGroup(group);
@@ -59,10 +80,8 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
       const newGroups = [...groups, groupName];
       setGroups(newGroups);
       
-      // Save groups to localStorage
       localStorage.setItem(`quiz_${quizId}_groups`, JSON.stringify(newGroups));
       
-      // Also save groups by creating a metadata question
       try {
         const metadataQuestion = {
           title: "__METADATA__",
@@ -72,7 +91,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           points: 0
         };
         
-        // Check if metadata question already exists
         const existingMetadata = questions.find(q => q.title === "__METADATA__");
         if (existingMetadata) {
           await updateQuestion(existingMetadata.id, { ...existingMetadata, groups: newGroups });
@@ -80,10 +98,9 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           await createQuestion(quizId, metadataQuestion);
         }
         
-        await load(); // Reload to get updated metadata
+        await load(); 
       } catch (error) {
         console.error('Error saving groups metadata:', error);
-        // Fallback to localStorage only
       }
     }
   };
@@ -93,16 +110,13 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
       const newGroups = groups.filter(g => g !== groupName);
       setGroups(newGroups);
       
-      // Save updated groups to localStorage
       localStorage.setItem(`quiz_${quizId}_groups`, JSON.stringify(newGroups));
       
-      // Move questions from deleted group to Ungrouped
       const updatedQuestions = questions.map((q: any) => 
         q.group === groupName ? { ...q, group: 'Ungrouped' } : q
       );
       setQuestions(updatedQuestions);
       
-      // Update metadata question
       try {
         const metadataQuestion = questions.find(q => q.title === "__METADATA__");
         if (metadataQuestion) {
@@ -115,7 +129,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
   };
   useEffect(() => { load(); }, [quizId]);
   
-  // Ensure blanks structure is properly initialized for existing fill-in-the-blank questions
   useEffect(() => {
     if (editingId && draft.type === "fillblanks" && (!draft.blanks || draft.blanks.length === 0)) {
       const blankCount = (draft.description || "").match(/_{3,}/g)?.length || 1;
@@ -128,9 +141,7 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
     }
   }, [editingId, draft.type, draft.description, draft.blanks]);
 
-  // Filter questions based on search term and selected group
   const filteredQuestions = questions.filter((q: any) => {
-    // Exclude metadata questions from display
     if (q.title === "__METADATA__" || q.type === "metadata") {
       return false;
     }
@@ -143,6 +154,10 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
     const matchesGroup = selectedGroup === "all" || q.group === selectedGroup || 
       (selectedGroup === "Ungrouped" && (!q.group || q.group === "Ungrouped"));
     
+    if (selectedGroup !== "all") {
+      console.log(`Question "${q.title}" has group: "${q.group}", selectedGroup: "${selectedGroup}", matchesGroup: ${matchesGroup}`);
+    }
+    
     return matchesSearch && matchesGroup;
   });
 
@@ -153,7 +168,7 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
         type: "mcq",
         description: "Enter your question here...",
         options: ["Option 1"],
-        answer: ["Option 1"], // Set first option as correct by default
+        answer: ["Option 1"], 
         blanks: [],
         group: "Ungrouped",
         points: 1
@@ -174,29 +189,43 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
   };
 
   const startEdit = (q: any) => { 
-    // Ensure backward compatibility for existing questions
     const questionData = { ...q };
     
-    // Handle fill-in-the-blank questions
+    let extractedGroup = 'Ungrouped';
+    
+    if (q.group && q.group !== 'Ungrouped') {
+      extractedGroup = q.group;
+    }
+    else if (q.title && q.title.match(/^\[(.*?)\]/)) {
+      const match = q.title.match(/^\[(.*?)\]/);
+      if (match && match[1]) {
+        extractedGroup = match[1];
+        questionData.title = q.title.replace(/^\[.*?\]\s*/, '');
+      }
+    }
+    else if (q.description && q.description.includes('Group:')) {
+      const groupMatch = q.description.match(/Group:\s*(.+?)(?:\n|$)/);
+      if (groupMatch && groupMatch[1]) {
+        extractedGroup = groupMatch[1].trim();
+        questionData.description = q.description.replace(/\n\nGroup:\s*.+?(?:\n|$)/, '');
+      }
+    }
+    
+    questionData.group = extractedGroup;
+    
     if (q.type === "fillblanks") {
       if (q.blanks && q.blanks.length > 0) {
-        // Use existing blanks structure if available
-        // This preserves the individual blank answers correctly
       } else if (q.answer && q.answer.length > 0) {
-        // Create blanks structure from existing answer array
         const blankCount = (q.description || "").match(/_{3,}/g)?.length || 1;
         
-        // If we have the same number of answers as blanks, distribute them properly
         if (q.answer.length === blankCount) {
           questionData.blanks = q.answer.map((answer: any) => ({ answers: [answer] }));
         } else {
-          // Otherwise, create blanks with the full answer array (for backward compatibility)
           questionData.blanks = Array(blankCount).fill(null).map(() => ({ 
             answers: q.answer || [] 
           }));
         }
       } else {
-        // Default structure for new fill-in-the-blank questions
         questionData.blanks = [{ answers: [] }];
       }
     }
@@ -208,7 +237,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
 
   const save = async () => {
     try {
-      // Basic validation for all question types
       if (!draft.title || draft.title.trim() === "") {
         alert('Question title is required.');
         return;
@@ -219,10 +247,20 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
         return;
       }
 
-      // Prepare data for saving - ensure backward compatibility
-      const saveData = { ...draft };
+      const saveData = { 
+        ...draft,
+        group: draft.group || 'Ungrouped' 
+      };
       
-      // Type-specific validation and data preparation
+      if (draft.group && draft.group !== 'Ungrouped') {
+        if (!saveData.title.startsWith(`[${draft.group}]`)) {
+          saveData.title = `[${draft.group}] ${saveData.title.replace(/^\[.*?\]\s*/, '')}`;
+        }
+        if (!saveData.description.includes(`Group: ${draft.group}`)) {
+          saveData.description = `${saveData.description}\n\nGroup: ${draft.group}`;
+        }
+      }
+      
       if (draft.type === "fillblanks") {
         if (!draft.description.includes('___')) {
           alert('Fill-in-the-blank questions must have ___ for blanks.');
@@ -234,16 +272,13 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           return;
         }
 
-        // Check if all blanks have answers
         const emptyBlanks = draft.blanks.filter((blank: any) => !blank.answers || blank.answers.length === 0);
         if (emptyBlanks.length > 0) {
           alert('All blanks must have at least one correct answer.');
           return;
         }
 
-        // Store the blanks structure for proper reconstruction
         saveData.blanks = draft.blanks;
-        // Also keep the flat answer array for backward compatibility
         saveData.answer = draft.blanks.flatMap((blank: any) => blank.answers || []);
       } else if (draft.type === "mcq") {
         if (!draft.options || draft.options.length === 0) {
@@ -251,7 +286,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           return;
         }
 
-        // Check if any options are empty
         const emptyOptions = draft.options.filter((opt: string) => !opt || opt.trim() === "");
         if (emptyOptions.length > 0) {
           alert('All options must have text.');
@@ -269,8 +303,25 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
         }
       }
 
-      await updateQuestion(editingId!, saveData);
+      console.log('Saving question with data:', saveData);
+      console.log('Question ID being updated:', editingId);
+      const result = await updateQuestion(editingId!, saveData);
+      console.log('Update result from backend:', result);
+      console.log('Question saved successfully');
+      
+      console.log('About to reload questions...');
       await load();
+      console.log('Questions reloaded. Current questions state:', questions);
+      
+      const reloadedQuestion = questions.find(q => q.id === editingId);
+      if (reloadedQuestion) {
+        console.log('Reloaded question group info:', {
+          id: reloadedQuestion.id,
+          title: reloadedQuestion.title,
+          group: reloadedQuestion.group,
+          expectedGroup: saveData.group
+        });
+      }
       setEditingId(null);
       setDraft({});
     } catch (error) {
@@ -287,8 +338,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
     await deleteQuestionAPI(quid);
     load();
   };
-
-  // Removed the set function - now using setDraft directly for better state management
 
   return (
     <div className="d-grid gap-3">
@@ -315,7 +364,10 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
           <select
             className="form-select"
             value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
+            onChange={(e) => {
+              console.log('Group filter changed to:', e.target.value);
+              setSelectedGroup(e.target.value);
+            }}
           >
             <option value="all">All Groups</option>
             <option value="Ungrouped">Ungrouped</option>
@@ -343,12 +395,10 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
                   <select className="form-select" value={draft.type || "mcq"} onChange={(e) => {
                     const newType = e.target.value;
                     setDraft((prev: any) => ({ ...prev, type: newType }));
-                    // Set appropriate defaults when type changes
                     if (newType === "fillblanks") {
                       if (!draft.description) {
                         setDraft((prev: any) => ({ ...prev, description: "The capital of France is ___ and the capital of Germany is ___." }));
                       }
-                      // Always initialize blanks structure when switching to fill-in-the-blanks
                       const blankCount = (draft.description || "The capital of France is ___ and the capital of Germany is ___.").match(/_{3,}/g)?.length || 2;
                       setDraft((prev: any) => ({ 
                         ...prev, 
@@ -360,14 +410,12 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
                       if (!draft.options || draft.options.length === 0) {
                         setDraft((prev: any) => ({ ...prev, options: ["Option 1"] }));
                       }
-                      // Set first option as correct answer for MCQ
                       setDraft((prev: any) => ({ 
                         ...prev, 
                         blanks: [], 
                         answer: prev.options && prev.options.length > 0 ? [prev.options[0]] : ["Option 1"]
                       }));
                     } else if (newType === "truefalse") {
-                      // Set True as default answer for True/False
                       setDraft((prev: any) => ({ 
                         ...prev, 
                         options: [], 
@@ -457,10 +505,8 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
                       value={draft.description || ""} onChange={(e) => {
                         const text = e.target.value;
                         
-                        // Update description first
                         setDraft((prev: any) => ({ ...prev, description: text }));
 
-                        // Auto-detect blanks and create structure
                         const blankCount = (text.match(/_{3,}/g) || []).length;
                         if (blankCount > 0) {
                           setDraft((prev: any) => {
@@ -474,7 +520,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
                             return prev;
                           });
                         } else {
-                          // If no blanks detected, clear the blanks array
                           setDraft((prev: any) => ({ ...prev, blanks: [] }));
                         }
                       }}
