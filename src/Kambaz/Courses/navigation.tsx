@@ -10,7 +10,7 @@ export default function CourseNavigation() {
     "Piazza",
     "Zoom",
     "Assignments",
-    "Quizzes",
+    "Quizzes",   // ✅ keep Quizzes in the list
     "Grades",
     "People",
   ];
@@ -20,14 +20,11 @@ export default function CourseNavigation() {
       {links.map((label) => {
         const path = `/Kambaz/Courses/${cid}/${label}`;
         const isActive = pathname === path || pathname.startsWith(path + "/");
-
         return (
           <Link
             key={label}
             to={path}
-            className={`list-group-item border border-0 ${
-              isActive ? "active" : "text-danger"
-            }`}
+            className={`list-group-item border-0 ${isActive ? "active" : "text-danger"}`}
           >
             {label}
           </Link>
