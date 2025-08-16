@@ -13,7 +13,7 @@ export default function Preview() {
     getQuiz(quizId).then(setQuiz);
     getQuestions(quizId).then((allQuestions) => {
       // Filter out metadata questions from quiz preview
-      const quizQuestions = allQuestions.filter((q: any) => 
+      const quizQuestions = allQuestions.filter((q: any) =>
         q.title !== "__METADATA__" && q.type !== "metadata"
       );
       setQuestions(quizQuestions);
@@ -69,7 +69,7 @@ export default function Preview() {
                   </div>
                 ) : (
                   <div>
-                    {(q.blanks ?? []).map((blank: any, idx: number) => (
+                    {(q.blanks ?? []).map((_: unknown, idx: number) => (
                       <div key={idx} className="mb-2">
                         <label className="form-label">Blank {idx + 1}:</label>
                         <input

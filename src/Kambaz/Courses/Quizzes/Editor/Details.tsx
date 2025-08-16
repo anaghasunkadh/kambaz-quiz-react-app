@@ -1,9 +1,9 @@
 type Props = {
   quiz: any;
-  onChange: (q:any)=>void;
-  onSave: ()=>void;
-  onSavePublish: ()=>void;
-  onCancel: ()=>void;
+  onChange: (q: any) => void;
+  onSave: () => void;
+  onSavePublish: () => void;
+  onCancel: () => void;
 };
 
 export default function Details({ quiz, onChange, onSave, onSavePublish, onCancel }: Props) {
@@ -22,7 +22,7 @@ export default function Details({ quiz, onChange, onSave, onSavePublish, onCance
       <label className="form-check">
         <input className="form-check-input" type="checkbox"
           checked={!!quiz.shuffle_answers}
-          onChange={e=>onChange({ ...quiz, shuffle_answers: e.target.checked })} />
+          onChange={e => onChange({ ...quiz, shuffle_answers: e.target.checked })} />
         <span className="form-check-label">Shuffle answers</span>
       </label>
 
@@ -30,7 +30,7 @@ export default function Details({ quiz, onChange, onSave, onSavePublish, onCance
         <div className="col-auto form-check">
           <input id="timelimit" className="form-check-input" type="checkbox"
             checked={!!quiz.time_limit}
-            onChange={e=>onChange({ ...quiz, time_limit: quiz.time_limit ? 0 : 30 })} />
+            onChange={() => onChange({ ...quiz, time_limit: quiz.time_limit ? 0 : 30 })} />
           <label htmlFor="timelimit" className="form-check-label">Time limit</label>
         </div>
         {quiz.time_limit ? (
