@@ -252,14 +252,6 @@ export default function QuestionsTab({ quizId }: { quizId: string }) {
         group: draft.group || 'Ungrouped' 
       };
       
-      if (draft.group && draft.group !== 'Ungrouped') {
-        if (!saveData.title.startsWith(`[${draft.group}]`)) {
-          saveData.title = `[${draft.group}] ${saveData.title.replace(/^\[.*?\]\s*/, '')}`;
-        }
-        if (!saveData.description.includes(`Group: ${draft.group}`)) {
-          saveData.description = `${saveData.description}\n\nGroup: ${draft.group}`;
-        }
-      }
       
       if (draft.type === "fillblanks") {
         if (!draft.description.includes('___')) {
