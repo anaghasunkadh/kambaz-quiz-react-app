@@ -11,7 +11,6 @@ import QuestionsDebug from "./Quizzes/Questions";
 // Quizzes pages
 import Quizzes from "./Quizzes";
 import QuizEditor from "./Quizzes/Editor";
-import QuizSummary from "./Quizzes/Summary";
 import Preview from "./Quizzes/Preview";
 
 export default function Courses({ courses }: { courses: any[] }) {
