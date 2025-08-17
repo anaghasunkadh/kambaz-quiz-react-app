@@ -11,7 +11,7 @@ import QuestionsDebug from "./Quizzes/Questions";
 // Quizzes pages
 import Quizzes from "./Quizzes";
 import QuizEditor from "./Quizzes/Editor";
-import QuizDetailsSummary from "./Quizzes/DetailSummary";
+import QuizSummary from "./Quizzes/Summary";
 import Preview from "./Quizzes/Preview";
 
 export default function Courses({ courses }: { courses: any[] }) {
@@ -41,12 +41,10 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route path=":cid/People" element={<People />} />
 
             {/* Quizzes */}
-            <Route path="Quizzes" element={<Quizzes />} />
-            <Route path="Quizzes/:quizId" element={<QuizEditor />} />
-            <Route path="Quizzes/:quizId/Summary" element={<QuizDetailsSummary />} />
-            <Route path="Quizzes/:quizId/Preview" element={<Preview />} />
-          <Route path="Quizzes/:quizId/QuestionsDebug" element={<QuestionsDebug />} />
-
+              <Route path="Quizzes" element={<Quizzes />} />
+              <Route path="Quizzes/:quizId" element={<QuizEditor />} />
+              <Route path="Quizzes/:quizId/Preview" element={<Preview />} />
+              <Route path="Quizzes/:quizId/QuestionsDebug" element={<QuestionsDebug />} />
           </Routes>
         </div>
       </div>

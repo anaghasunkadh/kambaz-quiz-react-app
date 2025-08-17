@@ -16,10 +16,8 @@ export default function QuizEditor() {
   const save = async (publish = false) => {
     await updateQuiz(quizId!, quiz);
     if (publish) await setPublished(quizId!, true);
-    // Save → details; Save&Publish → list (per rubric)
-    publish
-      ? navigate(`/Kambaz/Courses/${cid}/Quizzes`)
-      : navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/Summary`);
+    // Save and Save&Publish both navigate to quiz list
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   };
   const cancel = () => navigate(`/Kambaz/Courses/${cid}/Quizzes`);
 

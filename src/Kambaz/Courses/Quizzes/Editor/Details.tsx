@@ -1,3 +1,5 @@
+import { useNavigate, useParams } from "react-router-dom";
+
 type Props = {
   quiz: any;
   onChange: (q: any) => void;
@@ -12,6 +14,8 @@ export default function Details({ quiz, onChange, onSave, onSavePublish, onCance
     onChange: (e: any) =>
       onChange({ ...quiz, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value })
   });
+  const navigate = useNavigate();
+  const { cid, quizId } = useParams();
 
   return (
     <div className="d-grid gap-3">
@@ -56,6 +60,7 @@ export default function Details({ quiz, onChange, onSave, onSavePublish, onCance
         <button className="btn btn-secondary" onClick={onSave}>Save</button>
         <button className="btn btn-danger" onClick={onSavePublish}>Save & Publish</button>
         <button className="btn btn-outline-dark" onClick={onCancel}>Cancel</button>
+        <button className="btn btn-outline-primary" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/Preview`)}>Preview</button>
       </div>
     </div>
   );

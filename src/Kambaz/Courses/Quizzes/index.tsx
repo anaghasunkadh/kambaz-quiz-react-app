@@ -67,7 +67,7 @@ export default function Quizzes() {
               <div>
                 {/* ✅ title → details screen */}
                 <Link
-                  to={`/Kambaz/Courses/${cid}/Quizzes/${q.id}/Summary`}
+                  to={`/Kambaz/Courses/${cid}/Quizzes/${q.id}`}
                   className="fw-semibold text-decoration-none"
                 >
                   {q.title}
@@ -80,6 +80,18 @@ export default function Quizzes() {
 
               {/* 3-dot style menu simplified into two buttons */}
               <div className="btn-group">
+                <Link
+                  to={`/Kambaz/Courses/${cid}/Quizzes/${q.id}`}
+                  className="btn btn-sm btn-outline-primary"
+                >
+                  Edit
+                </Link>
+                <Link
+                  to={`/Kambaz/Courses/${cid}/Quizzes/${q.id}/Preview`}
+                  className="btn btn-sm btn-outline-info"
+                >
+                  Preview
+                </Link>
                 <button
                   className="btn btn-sm btn-outline-secondary"
                   onClick={() => onTogglePublish(q.id, q.published)}
